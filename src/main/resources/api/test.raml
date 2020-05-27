@@ -1,0 +1,170 @@
+#%RAML 1.0
+title: AlejandroRocha
+mediaType: 
+  - application/json
+  
+# baseUriParameters:
+#   payment_methods:
+#         description: A list of userIds
+#         type: string
+   
+  
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/6bdde610-1c23-464b-8905-082d59c6f73a/ # baseUri: core.spreedly.com/v1
+
+securitySchemes:
+  basic:
+    description: |
+     Autentificacion Basica.
+    type: Basic Authentication
+    describedBy:
+      headers:
+        Authorization:
+          description: |
+            Se utuliza para accerder al servicio.
+          type: string
+     
+      responses:
+        401:
+          description: |
+             Token mal o caducado. Esto puede suceder si el usuario o Dropbox revocó o expiró un token de acceso. Para solucionarlo, vuelva a autenticarse
+              el usuario..
+        403:
+          description: |
+              Solicitud incorrecta (clave de consumidor incorrecta, falta de validez incorrecta, caducada
+              marca de tiempo ...). Desafortunadamente, volver a autenticar al usuario no ayudará aquí.
+              
+protocols:
+  [HTTP, HTTPS]
+description: Recupere una lista ordenada y paginada de todos los métodos de pago retenidos en el entorno autenticado.
+ 
+documentation:
+  - title: API getway
+    content: obtenemos una lista de gateways https://docs.spreedly.com/reference/api/v1/#list
+
+          
+/{metodopago}{ext}:   
+  uriParameters:
+    metodopago:
+       default:   payment_methods
+       description: Path correcto de la URL 
+    ext:
+      default: .json
+      description: usa una extencion .json 
+   
+  post:
+    securedBy:
+        - basic
+    body:
+      application/json:
+             type: !include test/MTP.raml
+             example: !include test/MetodoPago.json 
+          
+    responses: 
+      201:
+        body: 
+          application/json:
+            type: !include test/MTPSalida.raml
+            example: !include test/MetodoPagoSalida.json 
+          
+          
+      400:
+       body: 
+         properties:
+             error:
+         example:
+             error: Peticion Carece de Credenciales 
+  
+      
+      500:
+        body: 
+         properties:
+             error:
+         example:
+             error: Algo salio mal intentalo de nuevo
+  
+            
+
+/{compra}/{tokenGateway}/{ext}:     
+ uriParameters:
+    compra:
+         default:   gateways
+         description: Path correcto de la URL 
+    tokenGateway:
+         default:  JuP3S8qy0c7ddteLNlvOIx67N7F 
+         description: Token requerido 
+    ext:
+      enum: [ purchase.json, purchase.xml ]
+      description: usa una extencion .json 
+
+ post:
+    securedBy:
+        - basic
+    body:
+      application/json:
+       properties:
+          input:
+             type: !include test/Comp.raml
+             example: !include test/Compra.json     
+    responses: 
+      201:
+        body: 
+          application/json:
+            type: !include test/CompSalida.raml
+            example: !include test/CompraSalida.json 
+      400:
+       body: 
+         properties:
+             error:
+         example:
+             error: Peticion Carece de Credenciales 
+  
+      
+      500:
+        body: 
+         properties:
+             error:
+         example:
+             error: Algo salio mal intentalo de nuevo
+
+
+/{transactions}/{transaction_token}/{ext}:     
+  uriParameters:
+    transactions:
+       default: gateways
+       description: Path correcto de la URL    
+    transaction_token:
+       default: 1702AQT85jLSC5yleCNBM4qxNQA  
+       description: Token requerido 
+    ext:
+      enum: [ purchase.json, purchase.xml ]
+      description: usa una extencion .json    
+   
+  post:
+    securedBy:
+        - basic
+    body:
+      application/json:
+        properties:
+          input:
+             type: !include test/Trans.raml
+             example: !include test/Transactions.json     
+    responses: 
+      201:
+        body: 
+          application/json:
+            type: !include test/TranSalida.raml
+            example: !include test/TransactionsSalida.json
+      400:
+       body: 
+         properties:
+             error:
+         example:
+             error: Peticion Carece de Credenciales 
+  
+      
+      500:
+        body: 
+         properties:
+             error:
+         example:
+             error: Algo salio mal intentalo de nuevo

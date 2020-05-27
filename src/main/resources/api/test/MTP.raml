@@ -1,0 +1,30 @@
+#%RAML 1.0 DataType
+ 
+type: object
+description: Entrada Metodo Pago
+
+properties: 
+      payment_method:
+        type: object 
+        properties: 
+         bank_account:
+           type: object 
+           properties: 
+            first_name:
+               type: string 
+            last_name:
+               type: string 
+            bank_routing_number:
+               type: string  
+            bank_account_number:
+               type: string  
+            bank_account_type?:
+              type: string  
+            bank_account_holder_type?:
+              type: string     
+
+            
+
+example: !include MetodoPago.json
+  
+

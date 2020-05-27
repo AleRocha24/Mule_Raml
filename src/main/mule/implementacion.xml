@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="2bd84899-a057-4e4b-ba13-471242cc146b" file="config.yaml" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="823689e8-4801-4e5d-b051-b97a688e5718" >
+		<http:request-connection host="${spreedly.host}" >
+			<http:authentication >
+				<http:basic-authentication username="${spreedly.username}" password="${spreedly.password}" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<flow name="PostFlowCompra" doc:id="fd660df1-3fbd-43cf-ba5e-0559348b3dd6" >
+		<set-variable value="payload" doc:name="Set Variable" doc:id="a34f4891-17e3-4ffe-8aca-a4b32a09842b" variableName="Datos"/>
+		<ee:transform doc:name="Transform Message" doc:id="7bbd4ac4-32dd-480c-a10f-2a153f4433f1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	transaction: {
+		payment_method_token: payload.payment_method_token,
+		amount: payload.amount,
+		currency_code: payload.currency_code
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Llamada Compra" doc:id="a50ca5ad-9fa9-4779-8e44-8655c94116a2" config-ref="HTTP_Request_configuration" path="/v1/gateways/JuP3S8qy0c7ddteLNlvOIx67N7F/purchase.json">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="674ac626-ecc9-4fbc-9af7-c4201a235d1d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	transaction: {
+		created: payload.transaction.created_at,
+		updated: payload.transaction.updated_at,
+		succeeded: payload.transaction.succeeded,
+		token: payload.transaction.token,
+		amount: payload.transaction.amount,
+		payment_method: {
+			token_method: payload.transaction.payment_method.token,
+			created_method: payload.transaction.payment_method.created_at,
+			updated_method: payload.transaction.payment_method.updated_at,
+			first_name_method: payload.transaction.payment_method.full_name,
+			last_name_method: payload.transaction.payment_method.last_name,
+			routing_number_method: payload.transaction.payment_method.routing_number,
+			account_number_method: payload.transaction.payment_method.account_number
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5a97c10b-4b48-469e-9beb-69cb57b5ec22" message='{"msj":"!! Exito"}'/>
+	</flow>
+	<flow name="PostFlowMetodoPago" doc:id="3fe0c45f-9a41-46ca-abc2-36a845d5ebfc" >
+		<set-variable value="payload" doc:name="Set Variable" doc:id="5f7b9420-606f-4b0b-a454-000e21eac739" variableName="DatosMetodoPago"/>
+		<ee:transform doc:name="Transform Message" doc:id="98516a9b-54f7-4b0f-b182-9f36eaec4d1e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	payment_method: {
+		bank_account: {
+			first_name: payload.first_name,
+			last_name: payload.last_name,
+			bank_routing_number: payload.bank_routing_number,
+			bank_account_number: payload.bank_account_number,
+			bank_account_type: payload.bank_account_type,
+			bank_account_holder_type: payload.bank_account_holder_type
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="61f8f8dc-4c11-4399-9f03-781fd80928eb" config-ref="HTTP_Request_configuration" path="/v1/payment_methods.json">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="3ba88253-bace-4e72-80c3-2b868d186ace">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	transaction: {
+		succeeded: payload.transaction.succeeded,
+		token: payload.transaction.token,
+		created: payload.transaction.created_at,
+		updated: payload.transaction.updated_at,
+		payment_method: {
+			token_method: payload.transaction.payment_method.token,
+			created_method: payload.transaction.payment_method.created_at,
+			updated_method: payload.transaction.payment_method.updated_at,
+			full_name_method: payload.transaction.payment_method.full_name,
+			routing_number: payload.transaction.payment_method.routing_number_display_digits,
+			account_number: payload.transaction.payment_method.account_number_display_digits
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="488c2f9c-7a5c-4156-b908-8e2d06487b89" message='{"msj":"! Exito"}'/>
+	</flow>
+	<flow name="PostFlowtransactions" doc:id="1fa02a12-f736-48f8-b655-dbc923338772" >
+		<set-variable value="payload" doc:name="Set Variable" doc:id="255f5ad3-65e6-4ac1-9a3c-36254d921acf" variableName="Datos3"/>
+		<ee:transform doc:name="Transform Message" doc:id="26379af8-5395-4847-940d-48143659a87a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	transaction: {
+		transaction_token: payload.transaction_token,
+		amount: payload.amount
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="d2a7ba1d-c773-4ed5-b11c-96fae067649a" config-ref="HTTP_Request_configuration" path="/v1/transactions/{transaction_token}/purchase.json">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"transaction_token" : payload.transaction.transaction_token
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="6893e794-bb4d-4390-9c82-f763f2e0bb08" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	transaction: {
+		message: payload.transaction.message,
+		created: payload.transaction.created_at,
+		updated: payload.transaction.updated_at,
+		token: payload.transaction.token,
+		amount: payload.transaction.amount,
+		gateway_token: payload.transaction.gateway_token,
+		reference_token: payload.transaction.reference_token
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f708cc19-7b22-4d64-95e9-30b44a61949d" message='{"msj":"!!! Exitosa Transacion"}'/>
+	</flow>
+</mule>

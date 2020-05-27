@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementacion-test-suite.xml" />
+	<munit:test name="implementacion-test-suite-PostFlowMetodoPagoTest" doc:id="c99f4cb9-5232-49ca-8a2f-48b5f724272e" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="4422cd2f-ad62-42f0-8db5-8e7139894713" >
+				<munit:payload value='{
+ "first_name": "Ale",
+            "last_name": "Rocha",
+            "bank_routing_number": "021000021",
+            "bank_account_number": "9876543210",
+            "bank_account_type": "checking",
+            "bank_account_holder_type": "personal"
+    
+        }' encoding="UTF-8" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PostFlowMetodoPago" doc:id="728baacc-c2fb-4038-a9c1-4f1a07c8c145" name="PostFlowMetodoPago"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="d409bfcf-49b3-4c1b-b41a-7d404bcbb480" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementacion-test-suite-PostFlowtransactionsTest" doc:id="38d8f67c-7d60-40c1-8f0f-f0ee03e78f2f" description="Test">
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="632056ea-f8d3-40b3-ac38-97e12cad3a18" >
+				<munit:payload value='{
+  	"transaction_token": "YGMHkQtNCU1YTqjRiRT74xhFsMy",
+    "amount": 128
+   
+}' encoding="UTF-8" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PostFlowtransactions" doc:id="79fef8c7-1638-443b-a2b1-c1ad21bdfa52" name="PostFlowtransactions"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="76bdc697-1dd4-48bd-bde5-010874eb5a95" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="implementacion-test-suite-PostFlowCompraTest" doc:id="7e304ed2-e263-4679-b7ce-d11c75255e63" description="Test">
+		<munit:execution>
+			<munit:set-event doc:name="Set Event" doc:id="abaaa845-d886-4935-9bfd-5c930d9ef60c">
+				<munit:payload value='{
+
+    "payment_method_token": "AzlyJpw36NC5KmlgUP34eDGb5Yv",
+    "amount": 100,
+    "currency_code": "USD"
+  
+}' encoding="UTF-8" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to PostFlowCompra" doc:id="a049921c-aeb1-47fc-8cc9-6a0b37d4be21" name="PostFlowCompra" />
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="04284de7-a1c6-43cf-b3a6-3d1d2d7e37a9" is="#[MunitTools::notNullValue()]" expression="#[payload]" />
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

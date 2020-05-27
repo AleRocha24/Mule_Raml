@@ -1,0 +1,7 @@
+http:
+  port: "8081"
+spreedly:  
+  host: "core.spreedly.com"
+  username: "QXamfjS8T4d5bRKqR7ocloaNOvU"
+  password: "fpSG443zFbGHThNvcTjrxMjiPBv8jA3967tZ73abKJHCO1Y5VO8ubHJy4sGTdk4H"
+ 

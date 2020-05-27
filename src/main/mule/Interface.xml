@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d65d5b9f-8304-4104-a9d4-7c5e5dccaeb9" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="1873a63a-315c-4615-997b-900765f0ce6d" file="config.yaml" />
+	
+	<flow name="InterfaceCompra" doc:id="45c1f8cc-3a2a-436e-b375-8ec7124390af" >
+		<http:listener doc:name="POST/compra" doc:id="4c9befa3-6db5-489e-a7bc-d1b9653d6039" config-ref="HTTP_Listener_config" path="/compra" allowedMethods="POST"/>
+		<flow-ref doc:name="PostFlowCompra" doc:id="626e0fd8-5041-4899-90fe-f8c3e6e42a9f" name="PostFlowCompra"/>
+	</flow>
+
+	<flow name="InterfaceMetodoPago" doc:id="b49c70bb-bce3-4676-a7a9-ce9ce3deb140" >
+		<http:listener doc:name="POST/metodopago" doc:id="de685f5c-1032-47f1-ac14-0d36b38e52e0" config-ref="HTTP_Listener_config" path="/metodopago" allowedMethods="POST"/>
+		<flow-ref doc:name="PostFlowMetodoPago" doc:id="8acc73ab-7960-4715-a3ca-16dc573ebdaa" name="PostFlowMetodoPago"/>
+	</flow>
+	<flow name="POSTInterfaceTransactions" doc:id="0670374a-3380-41ad-8c24-bdb94a4b3ba2" >
+		<http:listener doc:name="POST/transactions" doc:id="c38e839e-9538-4d2d-991c-87ceee1ecf9a" config-ref="HTTP_Listener_config" path="/transactions" allowedMethods="POST"/>
+		<flow-ref doc:name="PostFlowtransactions" doc:id="b2fd5ab1-dd89-4fe5-ba11-2129979765cc" name="PostFlowtransactions"/>
+	</flow>
+	
+</mule>
